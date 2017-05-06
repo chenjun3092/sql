@@ -81,7 +81,8 @@ func (s *Sql) Update(datas map[string]string) bool {
 		if datastring != "" {
 			datastring += ", "
 		}
-		datastring += k + " = " + v
+		// datastring += k + " = " + v
+		datastring += fmt.Sprintf("%s = '%s'", k, v)
 	}
 	o := orm.NewOrm()
 	sql := "UPDATE " + s.table + " set " + datastring + s.where
@@ -146,8 +147,10 @@ func (s *Sql) Insert(datas map[string]string) (bool, int64) {
  * @param string str limit字符 0,10       0偏移量，10查询数量
  * @return *Sql
  */
-func (s *Sql) Limit(str string) *Sql {
-	s.limit = " limit " + str
+func (s *Sql) Limit(offset string, pagesize string) *Sql {
+	if offset != "" && pagesize != "" {
+		s.limit = fmt.Sprintf(" limit %s,%s", offset, pagesize)
+	}
 	return s
 }
 
@@ -184,7 +187,7 @@ func (s *Sql) Order(maps map[string]string) *Sql {
  * @return *Sql
  **/
 func (s *Sql) Where(where []SqlWhere) *Sql {
-	if where != nil {
+	if where != nil && len(where) > 0 {
 		wherestring := " where "
 		for k, v := range where {
 			result := s.buildCondition(v.Field, v.Condition, v.Value)
