@@ -94,6 +94,25 @@ func (s *Sql) Update(datas map[string]string) bool {
 }
 
 /**
+ * 字段增加数值
+ *
+ * @param string  key 增加的字段
+ * @param int  var	  增加的值
+ * @return bool
+ */
+func (s *Sql) Inc(key string, val int) bool {
+	datastring := ""
+	datastring += fmt.Sprintf("%s = %s+%d", key, key, val)
+	o := orm.NewOrm()
+	sql := "UPDATE " + s.table + " set " + datastring + s.where
+	_, err := o.Raw(sql).Exec()
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+/**
  * 删除
  * @return bool
  */
